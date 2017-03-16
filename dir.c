@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "dir.h"
+#include <sys/stat.h>
 
 /* 
    Arguments: 
@@ -44,7 +45,12 @@ int listFiles(int fd, char * directory) {
        dirEntry;
        dirEntry = readdir(dir)) {
     if (dirEntry->d_type == DT_REG) {  // Regular file
-      dprintf(fd, "F    %s\n", dirEntry->d_name);
+      struct stat buf;
+
+      // This call really should check the return value
+      stat(dirEntry->d_name, &buf);
+
+	dprintf(fd, "F    %-20s     %d\n", dirEntry->d_name, buf.st_size);
     } else if (dirEntry->d_type == DT_DIR) { // Directory
       dprintf(fd, "D        %s\n", dirEntry->d_name);
     } else {
