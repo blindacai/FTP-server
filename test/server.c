@@ -19,6 +19,8 @@
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
+char buf[512];
+
 void sigchld_handler(int s)
 {
 	// waitpid() might overwrite errno, so we save and restore it:
@@ -121,7 +123,9 @@ int main(void)
 
 		// once connection is set up, send 220
 		
-		// while loop here to keep waiting for client's commands until quit
+		// inner while loop here to keep waiting for client's commands until quit
+
+		// need a receive function somewhere in the loop
 
 		if (!fork()) { // this is the child process
 			close(sockfd); // child doesn't need the listener
@@ -130,6 +134,9 @@ int main(void)
 			close(new_fd);
 			exit(0);
 		}
+
+		recv(new_fd, buf, sizeof(buf), 0);
+		
 		close(new_fd);  // parent doesn't need this
 	}
 
