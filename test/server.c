@@ -122,6 +122,7 @@ int main(void)
 		printf("server: got connection from %s\n", s);
 
 		// once connection is set up, send 220
+		send(new_fd, "220\n", 3, 0);
 		
 		// inner while loop here to keep waiting for client's commands until quit
 
@@ -135,8 +136,10 @@ int main(void)
 			exit(0);
 		}
 
-		recv(new_fd, buf, sizeof(buf), 0);
-		printf("print received: %s\n", buf);
+		while(recv(new_fd, buf, sizeof(buf), 0) != -1){
+			printf("print received: %s\n", buf);
+		}
+
 		
 		close(new_fd);  // parent doesn't need this
 	}
