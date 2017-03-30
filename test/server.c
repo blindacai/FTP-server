@@ -15,7 +15,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-#define PORT "3490"  // the port users will be connecting to
+#define PORT "3500"  // the port users will be connecting to
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
@@ -112,7 +112,7 @@ int main(void)
 		sin_size = sizeof their_addr;
 		new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);        // argv: original file descripter, pointer to the address of the client, size of the struct
 		if (new_fd == -1) {
-			perror("accept");
+			perror("accept");  // should be not accept?
 			continue;     // back to the beginning of outer while, waiting for connection
 		}
 
@@ -136,6 +136,7 @@ int main(void)
 		}
 
 		recv(new_fd, buf, sizeof(buf), 0);
+		printf("print received: %s\n", buf);
 		
 		close(new_fd);  // parent doesn't need this
 	}
