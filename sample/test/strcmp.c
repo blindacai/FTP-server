@@ -24,4 +24,13 @@ int main(){
     printf("compare: %d\n", strcmp(str1, middle));
     printf("compare: %d\n", strcmp(str1, piece));
 
+    char* user = "user";
+    char* quit = "quit";
+    printf("compare: %d\n", strcmp(user, quit));
+
+    char str5[512] = "quit\n";
+    char* str6 = "quit";
+    char* str7 = strtok(str5, " ");
+    printf("compare: %d\n", strcmp(str7, str6));
+
 }

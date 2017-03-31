@@ -122,7 +122,7 @@ int main(void)
 		printf("server: got connection from %s\n", s);
 
 		// once connection is set up, send 220
-		send(new_fd, "220\r\n", 3+2, 0);
+		send(new_fd, "220\n", 3+1, 0);
 		
 		// inner while loop here to keep waiting for client's commands until quit
 
@@ -130,7 +130,7 @@ int main(void)
 
 		if (!fork()) { // this is the child process
 			close(sockfd); // child doesn't need the listener
-			if (send(new_fd, "Hello, world!\r\n", 13+2, 0) == -1)            // argv: file descripter, message, size of the message, flag(should always be zero)
+			if (send(new_fd, "Hello, world!\n", 13+1, 0) == -1)            // argv: file descripter, message, size of the message, flag(should always be zero)
 				perror("send");
 			close(new_fd);
 			exit(0);
@@ -139,17 +139,21 @@ int main(void)
 		// note that size of buf is 512
 		while(recv(new_fd, buf, sizeof(buf), 0) != -1){
 			char* piece = strtok(buf, " ");
+			char* test = "quit\n";
 
-			while(piece){
-				printf("print received: %s\r\n", piece);
-				char* test = "quit";
-				printf("result of compare: %d\r\n", strcmp(piece, test));
-				if(strcmp(piece, test) == 0){
-					break;
-				}
+			char some[] = "quit";
+			printf("piece: %s", piece);
+			printf("result of compare: %d\n", strcmp(piece, test));
 
-				piece = strtok(NULL, " ");
-			}
+			// while(piece){
+			// 	char* test = "quit";
+			// 	printf("result of compare: %d\n", strcmp(piece, test));
+			// 	if(strcmp(piece, test) == 0){
+			// 		break;
+			// 	}
+
+			// 	piece = strtok(NULL, " ");
+			// }
 		}
 
 		close(new_fd);  // parent doesn't need this
