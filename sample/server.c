@@ -142,6 +142,11 @@ int main(void)
 
 			while(piece){
 				printf("print received: %s\r\n", piece);
+				char* test = "quit";
+				if(strcmp(piece, test) == 0){
+					break;
+				}
+
 				piece = strtok(NULL, " ");
 			}
 		}
