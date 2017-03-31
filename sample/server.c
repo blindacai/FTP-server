@@ -143,6 +143,7 @@ int main(void)
 			while(piece){
 				printf("print received: %s\r\n", piece);
 				char* test = "quit";
+				printf("result of compare: %d\r\n", strcmp(piece, test));
 				if(strcmp(piece, test) == 0){
 					break;
 				}
