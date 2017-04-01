@@ -112,7 +112,7 @@ int main(void)
 		sin_size = sizeof their_addr;
 		new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);        // argv: original file descripter, pointer to the address of the client, size of the struct
 		if (new_fd == -1) {
-			perror("accept");  // should be not accept?
+			perror("accept");  // should be 'not accept'?
 			continue;     // back to the beginning of outer while, waiting for connection
 		}
 
@@ -139,21 +139,17 @@ int main(void)
 		// note that size of buf is 512
 		while(recv(new_fd, buf, sizeof(buf), 0) != -1){
 			char* piece = strtok(buf, " ");
-			char* test = "quit\n";
+			char* command = "quit";
 
-			char some[] = "quit";
-			printf("piece: %s", piece);
-			printf("result of compare: %d\n", strcmp(piece, test));
+			while(piece){
+				char* test = "quit\n";
+				printf("result of compare: %d\n", strcmp(piece, test));
+				if(strcmp(piece, test) == 0){
+					break;
+				}
 
-			// while(piece){
-			// 	char* test = "quit";
-			// 	printf("result of compare: %d\n", strcmp(piece, test));
-			// 	if(strcmp(piece, test) == 0){
-			// 		break;
-			// 	}
-
-			// 	piece = strtok(NULL, " ");
-			// }
+				piece = strtok(NULL, " ");
+			}
 		}
 
 		close(new_fd);  // parent doesn't need this

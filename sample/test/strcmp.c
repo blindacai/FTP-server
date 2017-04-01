@@ -2,7 +2,7 @@
 #include <string.h>
 
 int main(){
-    printf("in test main\n");
+    printf("in string compare main\n");
 
     char* str1 = "hello";
     char* str2 = "hello";
