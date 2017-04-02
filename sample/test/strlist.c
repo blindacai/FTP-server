@@ -31,7 +31,7 @@ int main(){
     printf("addr of chars: %p\n", (void*) &chars);
     printf("addr of chars[1]: %p\n", (void*) &chars[1]);
 
-    // may use this to check the length of user commands
+    // ! ignore this part
     char** str_list3;
     str_list3[0] = "asd";
     str_list3[1] = "lkj";
@@ -40,4 +40,7 @@ int main(){
     printf("str_list3 0: %s\n", str_list3[0]);
     printf("str_list3 3: %s\n", str_list3[3]);
     // ! may cause seg fault   // should explicitly define the length: char* str_list3[4]
+
+    char* str1 = "abcd\n";
+    printf("len of string: %d\n", strlen(str1));
 }

@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <stdbool.h>
 
 #define PORT "3500"  // the port users will be connecting to
 
@@ -41,6 +42,41 @@ void *get_in_addr(struct sockaddr *sa)
 
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
+
+
+void sendError(int new_fd){
+	send(new_fd, "500\n", 3+1, 0);
+}
+
+
+// argv is a string
+// return true if the string ends with a new line
+bool checkForNewLine(char* str){
+	int i;
+	int length = strlen(str);
+
+	for(i = 0; i < length; i++){
+		if(*(str + i) == '\n'){
+			return true;
+		}
+	}
+	return false;
+}
+
+
+// argv: a list of string
+// return array length
+int arr_len(char** str_array){
+	char** offset;
+    for(offset = str_array; *offset != NULL; ++offset){
+		printf("offset is %s\n", *offset);
+		if(checkForNewLine(*offset)){
+			break;
+		}
+	}
+    return offset - str_array;
+}
+
 
 int main(void)
 {
@@ -138,21 +174,35 @@ int main(void)
 
 		// note that size of buf is 512
 		while(recv(new_fd, buf, sizeof(buf), 0) != -1){
+			
 			char* piece = strtok(buf, " ");
-			char* command = "quit";
+			printf("this buf is %c\n", *(buf + 1));
 
-			while(piece){
-				char* test = "quit\n";
-				printf("result of compare: %d\n", strcmp(piece, test));
-				if(strcmp(piece, test) == 0){
-					break;
-				}
-
+			// parse the command
+			char* commands[3];
+			int i = 0;
+			while(piece && (i < 3)){
+				commands[i] = piece;
+				printf("this piece is %s\n", commands[i]);
+				printf("count is %d\n", i);
 				piece = strtok(NULL, " ");
+				i++;
 			}
+
+			if(strncmp(commands[0], "quit", 4) == 0){
+				send(new_fd, "221 Goodbye\n", 11+1, 0);
+				break;
+			}
+
+			printf("array length: %d\n", arr_len(commands));
+			*commands = NULL;
+			*(commands + 1) = NULL;
+			*(commands + 2) = NULL;
 		}
 
 		close(new_fd);  // parent doesn't need this
+
+		continue;
 	}
 
 	return 0;
