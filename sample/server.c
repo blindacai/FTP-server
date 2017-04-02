@@ -178,9 +178,9 @@ int main(void)
 			char* piece = strtok(buf, " ");
 
 			// parse the command
-			char* commands[3];
+			char* commands[10];  // should it be dynamic?
 			int i = 0;
-			while(piece && (i < 3)){
+			while(piece){
 				commands[i] = piece;
 				printf("this piece is %s\n", commands[i]);
 				piece = strtok(NULL, " ");
@@ -192,6 +192,7 @@ int main(void)
 				break;
 			}
 
+			printf("check\n");
 			printf("array length: %d\n", arr_len(commands));
 
 			memset(buf, 0, strlen(buf));
