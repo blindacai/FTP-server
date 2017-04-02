@@ -39,4 +39,5 @@ int main(){
     str_list3[3] = NULL;
     printf("str_list3 0: %s\n", str_list3[0]);
     printf("str_list3 3: %s\n", str_list3[3]);
+    // ! may cause seg fault   // should explicitly define the length: char* str_list3[4]
 }

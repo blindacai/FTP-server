@@ -3,9 +3,11 @@
 #include "funB.h"
 
 int main(){
-    char** name;
-    name[0] = "apple";
-    name[1] = "juice";
-    str_len(string);
-    printf("length of string: %d\n", str_len(string));
+    char* name[5] = {};
+     name[0] = "apple";
+     name[1] = "juice";
+     name[2] = "pie";
+     printf("print name one: %s\n", name[0]);
+     printf("print name two: %s\n", name[1]);
+     printf("length of string: %d\n", str_len(name));
 }
