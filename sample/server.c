@@ -17,7 +17,7 @@
 #include <stdbool.h>
 #include "command.h"
 
-#define PORT "3500"  // the port users will be connecting to
+#define PORT "3600"  // the port users will be connecting to
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
@@ -170,6 +170,7 @@ int main(void)
 
 		// need a receive function somewhere in the loop
 
+/*
 		if (!fork()) { // this is the child process
 			close(sockfd); // child doesn't need the listener
 			if (send(new_fd, "Hello, world!\n", 13+1, 0) == -1)            // argv: file descripter, message, size of the message, flag(should always be zero)
@@ -177,10 +178,13 @@ int main(void)
 			close(new_fd);
 			exit(0);
 		}
+*/
 
 		// note that size of buf is 512
-		while(recv(new_fd, buf, sizeof(buf), 0) != -1){
-			
+		int result;
+		while((result = recv(new_fd, buf, sizeof(buf), 0)) != -1){
+			printf("recv result: %d\n", result);
+
 			char* piece = strtok(buf, " ");
 
 			// parse the command
@@ -188,18 +192,21 @@ int main(void)
 			int i = 0;
 			while(piece){
 				commands[i] = piece;
-				//printf("piece is %s\n", piece);
+				printf("piece is %s\n", piece);
 				piece = strtok(NULL, " ");
 				i++;
 			}
 
-			if(strncmp(commands[0], "quit", 4) == 0){
-				sendMsg(new_fd, "221 Goodbye\n");
+			if(strncmp(commands[0], "QUIT", 4) == 0){
+				sendMsg(new_fd, "221 221 Goodbye\n");
 				break;
 			}
 
 			if(arr_len(commands) > 2){
-				sendMsg(new_fd, "invalid command\n");
+				sendMsg(new_fd, "it's invalid command\n");
+			}
+			else{
+				sendMsg(new_fd, "331 Please specify the password.\n");
 			}
 
 			resetCommands(commands);
