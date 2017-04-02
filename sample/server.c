@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <stdbool.h>
+#include "command.h"
 
 #define PORT "3500"  // the port users will be connecting to
 
@@ -44,11 +45,6 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 
-void sendError(int new_fd){
-	send(new_fd, "500\n", 3+1, 0);
-}
-
-
 // argv is a string
 // return true if the string ends with a new line
 bool checkForNewLine(char* str){
@@ -69,7 +65,6 @@ bool checkForNewLine(char* str){
 int arr_len(char** str_array){
 	char** offset;
     for(offset = str_array; *offset != NULL; ++offset){
-		printf("offset is %s\n", *offset);
 		if(checkForNewLine(*offset)){
 			break;
 		}
@@ -182,18 +177,19 @@ int main(void)
 			int i = 0;
 			while(piece){
 				commands[i] = piece;
-				printf("this piece is %s\n", commands[i]);
 				piece = strtok(NULL, " ");
 				i++;
 			}
 
 			if(strncmp(commands[0], "quit", 4) == 0){
-				send(new_fd, "221 Goodbye\n", 11+1, 0);
+				//send(new_fd, "221 Goodbye\n", 11+1, 0);
+				sendMsg(new_fd, "221 Goodbye\n");
 				break;
 			}
 
-			printf("check\n");
-			printf("array length: %d\n", arr_len(commands));
+			if(arr_len(commands) > 2){
+				sendMsg(new_fd, "invalid command\n");
+			}
 
 			memset(buf, 0, strlen(buf));
 			// no need to reset commands; it's released from stack once out of while loop
