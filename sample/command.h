@@ -2,4 +2,8 @@
 #define __COMMAND_H__
 
 void sendMsg(int new_fd, char* string);
+bool checkForNewLine(char* str);
+int arr_len(char** str_array);
+
+void response(int new_fd, char** commands);
 #endif

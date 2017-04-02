@@ -45,33 +45,6 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 
-// argv is a string
-// return true if the string ends with a new line
-bool checkForNewLine(char* str){
-	int i;
-	int length = strlen(str);
-
-	for(i = 0; i < length; i++){
-		if(*(str + i) == '\n'){
-			return true;
-		}
-	}
-	return false;
-}
-
-
-// argv: a list of string
-// return array length
-int arr_len(char** str_array){
-	char** offset;
-    for(offset = str_array; *offset != NULL; ++offset){
-		if(checkForNewLine(*offset)){
-			break;
-		}
-	}
-    return offset - str_array + 1;
-}
-
 
 // reset each character of array to 0
 void resetCommands(char** commands){
@@ -198,15 +171,15 @@ int main(void)
 			}
 
 			if(strncmp(commands[0], "QUIT", 4) == 0){
-				sendMsg(new_fd, "221 221 Goodbye\n");
+				sendMsg(new_fd, "221 Goodbye\n");
 				break;
 			}
 
 			if(arr_len(commands) > 2){
-				sendMsg(new_fd, "it's invalid command\n");
+				sendMsg(new_fd, "too many commands\n");
 			}
 			else{
-				sendMsg(new_fd, "331 Please specify the password.\n");
+				response(new_fd, commands);
 			}
 
 			resetCommands(commands);
