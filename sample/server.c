@@ -73,6 +73,17 @@ int arr_len(char** str_array){
 }
 
 
+// reset each character of array to 0
+void resetCommands(char** commands){
+	int length = arr_len(commands);
+	int i;
+	for(i = 0; i < length; i++){
+		char* current = *(commands + i);
+		memset(current, 0, strlen(current));
+	}
+}
+
+
 int main(void)
 {
 	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
@@ -153,7 +164,7 @@ int main(void)
 		printf("server: got connection from %s\n", s);
 
 		// once connection is set up, send 220
-		send(new_fd, "220\n", 3+1, 0);
+		sendMsg(new_fd, "220\n");
 		
 		// inner while loop here to keep waiting for client's commands until quit
 
@@ -177,12 +188,12 @@ int main(void)
 			int i = 0;
 			while(piece){
 				commands[i] = piece;
+				//printf("piece is %s\n", piece);
 				piece = strtok(NULL, " ");
 				i++;
 			}
 
 			if(strncmp(commands[0], "quit", 4) == 0){
-				//send(new_fd, "221 Goodbye\n", 11+1, 0);
 				sendMsg(new_fd, "221 Goodbye\n");
 				break;
 			}
@@ -191,8 +202,8 @@ int main(void)
 				sendMsg(new_fd, "invalid command\n");
 			}
 
+			resetCommands(commands);
 			memset(buf, 0, strlen(buf));
-			// no need to reset commands; it's released from stack once out of while loop
 		}
 
 		close(new_fd);  // parent doesn't need this

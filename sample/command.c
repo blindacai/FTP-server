@@ -15,3 +15,7 @@
 void sendMsg(int new_fd, char* message){
 	send(new_fd, message, strlen(message), 0);
 }
+
+void response(){
+    
+}
