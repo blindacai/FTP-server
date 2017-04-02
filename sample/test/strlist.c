@@ -43,4 +43,12 @@ int main(){
 
     char* str1 = "abcd\n";
     printf("len of string: %d\n", strlen(str1));
+
+    char str3[10] = "abcd\n";
+    printf("str length: %d\n", strlen(str3));  //5 actual size
+    printf("str size: %d\n", sizeof(str3));  //10
+
+    char str2[6] = "apple\n";
+    memset(str2, 0, 10);
+    printf("reset string: %s\n", str2);
 }

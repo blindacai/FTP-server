@@ -74,7 +74,7 @@ int arr_len(char** str_array){
 			break;
 		}
 	}
-    return offset - str_array;
+    return offset - str_array + 1;
 }
 
 
@@ -176,7 +176,6 @@ int main(void)
 		while(recv(new_fd, buf, sizeof(buf), 0) != -1){
 			
 			char* piece = strtok(buf, " ");
-			printf("this buf is %c\n", *(buf + 1));
 
 			// parse the command
 			char* commands[3];
@@ -184,7 +183,6 @@ int main(void)
 			while(piece && (i < 3)){
 				commands[i] = piece;
 				printf("this piece is %s\n", commands[i]);
-				printf("count is %d\n", i);
 				piece = strtok(NULL, " ");
 				i++;
 			}
@@ -195,9 +193,9 @@ int main(void)
 			}
 
 			printf("array length: %d\n", arr_len(commands));
-			*commands = NULL;
-			*(commands + 1) = NULL;
-			*(commands + 2) = NULL;
+
+			memset(buf, 0, strlen(buf));
+			// no need to reset commands; it's released from stack once out of while loop
 		}
 
 		close(new_fd);  // parent doesn't need this
