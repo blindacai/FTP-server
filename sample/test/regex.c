@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <string.h>
 #include <stdlib.h>
 
 #include <sys/types.h>
@@ -39,11 +38,12 @@ int main(){
     }
 
 /* Execute regular expression */
-    reti = regexec(&regex, "...", 0, NULL, 0);
+    reti = regexec(&regex, "aaa", 0, NULL, 0);
     if(!reti){
         puts("Match");
     }
     else if(reti == REG_NOMATCH){
+        printf("constant no match: %d\n", REG_NOMATCH);
         puts("No match");
     }
     else{

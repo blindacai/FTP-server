@@ -12,6 +12,12 @@
 #include <signal.h>
 #include <stdbool.h>
 
+#include <regex.h>
+#include <sys/types.h>
+
+#include "command.h"
+#include "dir.h"
+
 int new_fd;
 bool loggedin = false;
 
@@ -138,6 +144,41 @@ void type(char* thetype){
 }
 
 
+// return true if not allowed pattern detected
+bool notallow_match(char* dir){
+	regex_t regex;
+    int reti;
+	reti = regcomp(&regex, "/{0,1}.{0,1}[.]/{0,1}", REG_EXTENDED);
+
+	if(reti){ 
+		fprintf(stderr, "Could not compile regex\n"); 
+    }
+
+	// execute
+	reti = regexec(&regex, dir, 0, NULL, 0);
+	return !reti;
+}
+
+
+// process 'cwd local' command
+void cdinto(char* dir){
+	if(notallow_match(dir)){
+		sendMsg("550 Not allowed to change directory this way.\n\r");
+		listFiles(1, "./");
+	}
+	else{
+		if(chdir(dir) == 0){
+			sendMsg("250 Directory successfully changed.\n\r");
+		}
+		else{
+			sendMsg("550 Failed to change directory.\n\r");
+		}
+	
+		listFiles(1, "./");
+	}
+}
+
+
 // create server response
 void response(char** commands){
 	if(strcmp(commands[0], "USER") == 0){
@@ -151,6 +192,9 @@ void response(char** commands){
 	}
 	else if(strcmp(commands[0], "STRU") == 0){
 		sendMsg("We only support file structure, sorry.\n\r");
+	}
+	else if(strcmp(commands[0], "CWD") == 0){
+		cdinto(commands[1]);
 	}
 	else{
 		invalid();
