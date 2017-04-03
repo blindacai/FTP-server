@@ -72,7 +72,7 @@ bool checkForNewLine(char* str){
 }
 
 
-// argv: a list of string
+// argv: an array of string
 // return array length
 int arr_len(char** str_array){
 	char** offset;
@@ -145,6 +145,12 @@ void response(char** commands){
 	}
 	else if(strcmp(commands[0], "TYPE") == 0){
 		type(commands[1]);
+	}
+	else if(strcmp(commands[0], "MODE") == 0){
+		sendMsg("We only support stream mode, sorry.\n\r");
+	}
+	else if(strcmp(commands[0], "STRU") == 0){
+		sendMsg("We only support file structure, sorry.\n\r");
 	}
 	else{
 		invalid();

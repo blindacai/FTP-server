@@ -6,3 +6,7 @@ int str_len(char** string){
     for(offset = string; *offset != NULL; ++offset);
     return offset - string;
 }
+
+int test_refer(){
+    return 10;
+}
