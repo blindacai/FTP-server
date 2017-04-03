@@ -7,6 +7,7 @@ int arr_len(char** str_array);
 
 void resetLogin();
 void set_newfd(int newfd);
+void set_rootdir(char* root);
 
 void remove_endofline(char** commands);
 void response(char** commands);

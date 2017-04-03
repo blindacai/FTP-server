@@ -23,6 +23,8 @@
 
 char buf[512];
 
+char root[100];
+
 void sigchld_handler(int s)
 {
 	// waitpid() might overwrite errno, so we save and restore it:
@@ -127,6 +129,9 @@ int main(void)
 		set_newfd(new_fd);
 		// once connection is set up, send 220
 		sendMsg("220\n");
+
+		getcwd(root, 100);
+		set_rootdir(root);
 		
 		// inner while loop here to keep waiting for client's commands until quit
 

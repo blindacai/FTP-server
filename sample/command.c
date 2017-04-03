@@ -20,7 +20,13 @@
 
 int new_fd;
 bool loggedin = false;
+char root_dir[100];
 
+
+void set_rootdir(char* root){
+	strcpy(root_dir, root);
+	printf("root dir: %s\n", root_dir);
+}
 
 void set_newfd(int newfd){
 	new_fd = newfd;
@@ -180,7 +186,7 @@ void cdinto(char* dir){
 
 	if(notallow_match(dir)){
 		sendMsg("550 Not allowed to change directory this way.\n\r");
-		listFiles(1, "./");
+		listFiles(1, "./");            // for testing
 	}
 	else{
 		if(chdir(dir) == 0){
@@ -190,15 +196,15 @@ void cdinto(char* dir){
 			sendMsg("550 Failed to change directory.\n\r");
 		}
 	
-		listFiles(1, "./");
+		listFiles(1, "./");            // for testing
 	}
 }
 
 
+// process 'MODE' command
 void switchmode(char* mode){
 	if(mode == NULL){
 		sendMsg("Transfer mode not specified\n\r");
-		return;
 	}
 	else{
 		sendMsg("We only support stream mode, sorry.\n\r");
@@ -206,10 +212,10 @@ void switchmode(char* mode){
 }
 
 
+// process 'STRU' command
 void switchstru(char* stru){
 	if(stru == NULL){
 		sendMsg("File structure not specified\n\r");
-		return;
 	}
 	else{
 		sendMsg("We only support file structure, sorry.\n\r");
@@ -217,8 +223,24 @@ void switchstru(char* stru){
 }
 
 
-void cdto_parent(){
+// return true if current dir is the root dir
+bool in_rootdir(){
+	char current[100];
+	getcwd(current, 100);
+	return !strcmp(current, root_dir);
+}
 
+
+// process 'CDUP' command
+void cdto_parent(){
+	if(in_rootdir()){
+		sendMsg("Cannot change directory. Already in root\n\r");
+	}
+	else{
+		chdir("../");
+		sendMsg("250 Directory successfully changed.\n\r");
+		listFiles(1, "./");              // for testing
+	}
 }
 
 
