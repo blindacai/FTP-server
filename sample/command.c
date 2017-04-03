@@ -12,6 +12,18 @@
 #include <signal.h>
 #include <stdbool.h>
 
+int newfd;
+bool loggedin = false;
+
+
+void sendMsg(int new_fd, char* message){
+	send(new_fd, message, strlen(message), 0);
+}
+
+
+void invalid(){
+	sendMsg(newfd, "Invalid Command.\n\r");
+}
 
 void printfCommands(char** commands){
 	char** offset = commands;
@@ -31,11 +43,6 @@ void printfString(char* string){
 }
 
 
-void sendMsg(int new_fd, char* message){
-	send(new_fd, message, strlen(message), 0);
-}
-
-
 // argv is a string
 // return true if the string ends with a new line
 bool checkForNewLine(char* str){
@@ -44,7 +51,8 @@ bool checkForNewLine(char* str){
 	char* offset = str;
 
 	for(i = 0; i < length; i++){
-		if(*(offset + i) == '\n'){
+		char current = *(offset + i);
+		if(current == '\n' || current == '\r'){
 			return true;
 		}
 	}
@@ -67,15 +75,19 @@ int arr_len(char** str_array){
 
 void remove_endofstring(char* string){
 	int length = strlen(string);
-	string[length - 1] = 0;
+	char last = string[length - 1];
+	char second_last = string[length - 2];
+	
+	if(last == '\n' || last == '\r'){
+		string[length - 1] = 0;
+	}
+	if(second_last == '\n' || second_last == '\r'){
+		string[length - 2] = 0;
+	}
 }
 
 
 void remove_endofline(char** commands){
-	if(!checkForNewLine(commands[0])){
-		return;
-	}
-
 	if(arr_len(commands) == 1){
 		remove_endofstring(commands[0]);
 		return;
@@ -86,18 +98,30 @@ void remove_endofline(char** commands){
 	}
 }
 
+void user(char* username){
+	if(loggedin){
+		invalid();
+		return;
+	}
+
+	if(strcmp(username, "cs317") == 0){
+		sendMsg(newfd, "230 Login successful.\n\r");
+		loggedin = true;
+	}
+	else{
+		sendMsg(newfd, "530 This FTP server is cs317 only.\n\r");
+	}
+}
+
 void response(int new_fd, char** commands){
-	//printf("commands: %s\n", commands[0]);
+	newfd = new_fd;
 	remove_endofline(commands);
 
-	//sendMsg(new_fd, "230 Login successful.\n\rRemote system type is UNIX.\n\rUsing binary mode to transfer files.\n\r");
-	//sendMsg(new_fd, "230 Login successful.\n\r");
-
 	if(strcmp(commands[0], "USER") == 0){
-		sendMsg(new_fd, "230 Login successful.\n\r");
+		user(commands[1]);
 	}
 
 	else{
-		sendMsg(new_fd, "invalid commands.\n\r");
+		invalid();
 	}
 }

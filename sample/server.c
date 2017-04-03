@@ -21,7 +21,7 @@
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
-char buf[20];
+char buf[512];
 
 void sigchld_handler(int s)
 {
@@ -169,7 +169,7 @@ int main(void)
 				response(new_fd, commands);
 			}
 
-			// seems strtok did something so length of buf is only first part of the commands
+			// seems strtok did something so length of buf is only calculate the first part of the commands
 			//printf("string length of buf: %d\n", strlen(buf));
 
 			// reset buf
