@@ -124,8 +124,9 @@ int main(void)
 			s, sizeof s);
 		printf("server: got connection from %s\n\r", s);
 
+		set_newfd(new_fd);
 		// once connection is set up, send 220
-		sendMsg(new_fd, "220\n");
+		sendMsg("220\n");
 		
 		// inner while loop here to keep waiting for client's commands until quit
 
@@ -160,17 +161,17 @@ int main(void)
 			remove_endofline(commands);
 
 			if(strcmp(commands[0], "QUIT") == 0){
-				sendMsg(new_fd, "221 Goodbye\n\r");
+				sendMsg("221 Goodbye\n\r");
 				resetLogin();
 				break;
 			}
 
 
 			if(arr_len(commands) > 2){
-				sendMsg(new_fd, "too many commands\n\r");
+				sendMsg("too many commands\n\r");
 			}
 			else{
-				response(new_fd, commands);
+				response(commands);
 			}
 
 			// seems strtok did something so length of buf is only calculate the first part of the commands

@@ -12,22 +12,26 @@
 #include <signal.h>
 #include <stdbool.h>
 
-int newfd;
+int new_fd;
 bool loggedin = false;
 
+
+void set_newfd(int newfd){
+	new_fd = newfd;
+}
 
 void resetLogin(){
 	loggedin = false;
 }
 
 
-void sendMsg(int new_fd, char* message){
+void sendMsg(char* message){
 	send(new_fd, message, strlen(message), 0);
 }
 
 
 void invalid(){
-	sendMsg(newfd, "Invalid Command.\n\r");
+	sendMsg("Invalid Command.\n\r");
 }
 
 
@@ -113,20 +117,20 @@ void user(char* username){
 	}
 
 	if(strcmp(username, "cs317") == 0){
-		sendMsg(newfd, "230 Login successful.\n\r");
+		sendMsg("230 Login successful.\n\r");
 		loggedin = true;
 	}
 	else{
-		sendMsg(newfd, "530 This FTP server is cs317 only.\n\r");
+		sendMsg("530 This FTP server is cs317 only.\n\r");
 	}
 }
 
 void type(char* thetype){
 	if(strcmp(thetype, "I") == 0){
-		sendMsg(newfd, "200 Switching to Binary mode.\n\r");
+		sendMsg("200 Switching to Binary mode.\n\r");
 	}
 	else if(strcmp(thetype, "A") == 0){
-		sendMsg(newfd, "200 Switching to ASCII mode.\n\r");
+		sendMsg("200 Switching to ASCII mode.\n\r");
 	}
 	else{
 		invalid();
@@ -135,9 +139,7 @@ void type(char* thetype){
 
 
 // create server response
-void response(int new_fd, char** commands){
-	newfd = new_fd;
-
+void response(char** commands){
 	if(strcmp(commands[0], "USER") == 0){
 		user(commands[1]);
 	}
