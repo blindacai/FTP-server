@@ -118,7 +118,11 @@ void remove_endofline(char** commands){
 // process 'user cs317' command
 void user(char* username){
 	if(loggedin){
-		invalid();
+		sendMsg("You are already logged in\n\r");
+		return;
+	}
+	if(username == NULL){
+		sendMsg("530 Please provide username\n\r");
 		return;
 	}
 
@@ -131,7 +135,14 @@ void user(char* username){
 	}
 }
 
+
+// process 'type image' command
 void type(char* thetype){
+	if(thetype == NULL){
+		sendMsg("Transfer type not specified\n\r");
+		return;
+	}
+
 	if(strcmp(thetype, "I") == 0){
 		sendMsg("200 Switching to Binary mode.\n\r");
 	}
@@ -162,6 +173,11 @@ bool notallow_match(char* dir){
 
 // process 'cwd local' command
 void cdinto(char* dir){
+	if(dir == NULL){
+		sendMsg("Please provide the directory\n\r");
+		return;
+	}
+
 	if(notallow_match(dir)){
 		sendMsg("550 Not allowed to change directory this way.\n\r");
 		listFiles(1, "./");
@@ -179,8 +195,40 @@ void cdinto(char* dir){
 }
 
 
+void switchmode(char* mode){
+	if(mode == NULL){
+		sendMsg("Transfer mode not specified\n\r");
+		return;
+	}
+	else{
+		sendMsg("We only support stream mode, sorry.\n\r");
+	}
+}
+
+
+void switchstru(char* stru){
+	if(stru == NULL){
+		sendMsg("File structure not specified\n\r");
+		return;
+	}
+	else{
+		sendMsg("We only support file structure, sorry.\n\r");
+	}
+}
+
+
+void cdto_parent(){
+
+}
+
+
 // create server response
 void response(char** commands){
+	if(!loggedin && (strcmp(commands[0], "USER") != 0)){
+		sendMsg("Please log in first\n\r");
+		return;
+	}
+
 	if(strcmp(commands[0], "USER") == 0){
 		user(commands[1]);
 	}
@@ -188,13 +236,16 @@ void response(char** commands){
 		type(commands[1]);
 	}
 	else if(strcmp(commands[0], "MODE") == 0){
-		sendMsg("We only support stream mode, sorry.\n\r");
+		switchmode(commands[1]);
 	}
 	else if(strcmp(commands[0], "STRU") == 0){
-		sendMsg("We only support file structure, sorry.\n\r");
+		switchstru(commands[1]);
 	}
 	else if(strcmp(commands[0], "CWD") == 0){
 		cdinto(commands[1]);
+	}
+	else if(strcmp(commands[0], "CDUP") == 0){
+		cdto_parent();
 	}
 	else{
 		invalid();
