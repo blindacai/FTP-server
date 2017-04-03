@@ -160,6 +160,8 @@ int main(void)
 
 			remove_endofline(commands);
 
+			// TODO: conver to uppercase
+
 			if(strcmp(commands[0], "QUIT") == 0){
 				sendMsg("221 Goodbye\n\r");
 				resetLogin();
@@ -174,7 +176,7 @@ int main(void)
 				response(commands);
 			}
 
-			// seems strtok did something so length of buf is only calculate the first part of the commands
+			// seems strtok did something to buf, so length of buf only calculate the first part of the commands
 			//printf("string length of buf: %d\n", strlen(buf));
 
 			// reset buf
