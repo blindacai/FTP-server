@@ -121,6 +121,18 @@ void user(char* username){
 	}
 }
 
+void type(char* thetype){
+	if(strcmp(thetype, "I") == 0){
+		sendMsg(newfd, "200 Switching to Binary mode.\n\r");
+	}
+	else if(strcmp(thetype, "A") == 0){
+		sendMsg(newfd, "200 Switching to ASCII mode.\n\r");
+	}
+	else{
+		invalid();
+	}
+}
+
 
 // create server response
 void response(int new_fd, char** commands){
@@ -129,7 +141,9 @@ void response(int new_fd, char** commands){
 	if(strcmp(commands[0], "USER") == 0){
 		user(commands[1]);
 	}
-
+	else if(strcmp(commands[0], "TYPE") == 0){
+		type(commands[1]);
+	}
 	else{
 		invalid();
 	}
