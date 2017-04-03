@@ -17,11 +17,11 @@
 #include <stdbool.h>
 #include "command.h"
 
-#define PORT "3600"  // the port users will be connecting to
+#define PORT "5500"  // the port users will be connecting to
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
-char buf[512];
+char buf[20];
 
 void sigchld_handler(int s)
 {
@@ -42,18 +42,6 @@ void *get_in_addr(struct sockaddr *sa)
 	}
 
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-
-
-
-// reset each character of array to 0
-void resetCommands(char** commands){
-	int length = arr_len(commands);
-	int i;
-	for(i = 0; i < length; i++){
-		char* current = *(commands + i);
-		memset(current, 0, strlen(current));
-	}
 }
 
 
@@ -134,7 +122,7 @@ int main(void)
 		inet_ntop(their_addr.ss_family,
 			get_in_addr((struct sockaddr *)&their_addr),
 			s, sizeof s);
-		printf("server: got connection from %s\n", s);
+		printf("server: got connection from %s\n\r", s);
 
 		// once connection is set up, send 220
 		sendMsg(new_fd, "220\n");
@@ -156,34 +144,36 @@ int main(void)
 		// note that size of buf is 512
 		int result;
 		while((result = recv(new_fd, buf, sizeof(buf), 0)) != -1){
-			printf("recv result: %d\n", result);
 
 			char* piece = strtok(buf, " ");
 
 			// parse the command
-			char* commands[10];  // should it be dynamic?
+			char* commands[5];  // should it be dynamic?
 			int i = 0;
 			while(piece){
 				commands[i] = piece;
-				printf("piece is %s\n", piece);
+				printf("piece is %s\n\r", piece);
 				piece = strtok(NULL, " ");
 				i++;
 			}
 
 			if(strncmp(commands[0], "QUIT", 4) == 0){
-				sendMsg(new_fd, "221 Goodbye\n");
+				sendMsg(new_fd, "221 Goodbye\n\r");
 				break;
 			}
 
 			if(arr_len(commands) > 2){
-				sendMsg(new_fd, "too many commands\n");
+				sendMsg(new_fd, "too many commands\n\r");
 			}
 			else{
 				response(new_fd, commands);
 			}
 
-			resetCommands(commands);
-			memset(buf, 0, strlen(buf));
+			// seems strtok did something so length of buf is only first part of the commands
+			//printf("string length of buf: %d\n", strlen(buf));
+
+			// reset buf
+			memset(buf, 0, sizeof(buf));
 		}
 
 		close(new_fd);  // parent doesn't need this

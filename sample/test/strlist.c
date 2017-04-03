@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
+void changeString(char* str4){
+    str4[0] = 'y';
+}
+
 int main(){
     printf("in string list main\n");
 
@@ -51,4 +55,11 @@ int main(){
     char str2[6] = "apple\n";
     memset(str2, 0, 10);
     printf("reset string: %s\n", str2);
+
+    char str4[5] = "lkjh\n";
+    changeString(str4);     // pass by reference
+    printf("new str4: %s\n", str4);
+
+    char str5[10] = "abc a\0bc";
+    printf("len of str6: %d\n", strlen(str5));
 }

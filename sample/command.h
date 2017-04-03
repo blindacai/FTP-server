@@ -6,4 +6,7 @@ bool checkForNewLine(char* str);
 int arr_len(char** str_array);
 
 void response(int new_fd, char** commands);
+
+void printfCommands(char** commands);
+void printfString(char* string);
 #endif
