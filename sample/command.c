@@ -16,6 +16,11 @@ int newfd;
 bool loggedin = false;
 
 
+void resetLogin(){
+	loggedin = false;
+}
+
+
 void sendMsg(int new_fd, char* message){
 	send(new_fd, message, strlen(message), 0);
 }
@@ -25,6 +30,8 @@ void invalid(){
 	sendMsg(newfd, "Invalid Command.\n\r");
 }
 
+
+// for testing
 void printfCommands(char** commands){
 	char** offset = commands;
 	while(*offset){
@@ -34,6 +41,7 @@ void printfCommands(char** commands){
 }
 
 
+// for testing
 void printfString(char* string){
 	char* offset = string;
 	while(*offset != '\0'){
@@ -64,15 +72,12 @@ bool checkForNewLine(char* str){
 // return array length
 int arr_len(char** str_array){
 	char** offset;
-    for(offset = str_array; *offset != NULL || *offset == 0; ++offset){
-		if(checkForNewLine(*offset)){
-			break;
-		}
-	}
-    return offset - str_array + 1;
+    for(offset = str_array; *offset != NULL; ++offset);
+    return offset - str_array;
 }
 
 
+// remove \r or \n from the end of a string
 void remove_endofstring(char* string){
 	int length = strlen(string);
 	char last = string[length - 1];
@@ -87,6 +92,7 @@ void remove_endofstring(char* string){
 }
 
 
+// remove \r or \n from the end of user commands
 void remove_endofline(char** commands){
 	if(arr_len(commands) == 1){
 		remove_endofstring(commands[0]);
@@ -98,6 +104,8 @@ void remove_endofline(char** commands){
 	}
 }
 
+
+// process 'user cs317' command
 void user(char* username){
 	if(loggedin){
 		invalid();
@@ -113,9 +121,10 @@ void user(char* username){
 	}
 }
 
+
+// create server response
 void response(int new_fd, char** commands){
 	newfd = new_fd;
-	remove_endofline(commands);
 
 	if(strcmp(commands[0], "USER") == 0){
 		user(commands[1]);

@@ -148,7 +148,7 @@ int main(void)
 			char* piece = strtok(buf, " ");
 
 			// parse the command
-			char* commands[5];  // should it be dynamic?
+			char* commands[5] = {NULL, NULL, NULL, NULL, NULL};  // should it be dynamic?
 			int i = 0;
 			while(piece){
 				commands[i] = piece;
@@ -157,10 +157,14 @@ int main(void)
 				i++;
 			}
 
-			if(strncmp(commands[0], "QUIT", 4) == 0){
+			remove_endofline(commands);
+
+			if(strcmp(commands[0], "QUIT") == 0){
 				sendMsg(new_fd, "221 Goodbye\n\r");
+				resetLogin();
 				break;
 			}
+
 
 			if(arr_len(commands) > 2){
 				sendMsg(new_fd, "too many commands\n\r");
