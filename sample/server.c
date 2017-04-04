@@ -17,7 +17,7 @@
 #include <stdbool.h>
 #include "command.h"
 
-#define PORT "5500"  // the port users will be connecting to
+#define PORT "6500"  // the port users will be connecting to
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
@@ -127,7 +127,7 @@ int main(void)
 		printf("server: got connection from %s\n\r", s);
 
 		set_newfd(new_fd);
-		// once connection is set up, send 220
+		// once connection is set up, send 220; should not add \r here
 		sendMsg("220\n");
 
 		getcwd(root, 100);

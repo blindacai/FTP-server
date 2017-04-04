@@ -25,7 +25,7 @@ char root_dir[100];
 
 void set_rootdir(char* root){
 	strcpy(root_dir, root);
-	printf("root dir: %s\n", root_dir);
+	printf("root dir: %s\n\r", root_dir);
 }
 
 void set_newfd(int newfd){
@@ -43,7 +43,7 @@ void sendMsg(char* message){
 
 
 void invalid(){
-	sendMsg("Invalid Command.\n\r");
+	sendMsg("500 Invalid Command.\n\r");
 }
 
 
@@ -168,7 +168,7 @@ bool notallow_match(char* dir){
 	reti = regcomp(&regex, "/{0,1}.{0,1}[.]/{0,1}", REG_EXTENDED);
 
 	if(reti){ 
-		fprintf(stderr, "Could not compile regex\n"); 
+		fprintf(stderr, "Could not compile regex\n\r"); 
     }
 
 	// execute
@@ -268,6 +268,12 @@ void response(char** commands){
 	}
 	else if(strcmp(commands[0], "CDUP") == 0){
 		cdto_parent();
+	}
+	else if(strcmp(commands[0], "PASV") == 0){
+		sendMsg("227 Enter PASV mode.\n\r");
+	}
+	else if (strcmp(commands[0], "PORT") == 0){
+		printf("The port is %s\n\r", commands[1]);
 	}
 	else{
 		invalid();
