@@ -243,6 +243,10 @@ void cdto_parent(){
 	}
 }
 
+// convert to uppercase
+void uppercase (char *sPtr) {
+    while(*sPtr = toupper(*sPtr)) sPtr++;
+}
 
 // create server response
 void response(char** commands){

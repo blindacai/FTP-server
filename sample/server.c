@@ -165,14 +165,9 @@ int main(void)
 
 			remove_endofline(commands);
 
-			// TODO: conver to uppercase
-			void uppercase (char *sPtr) {
-        		while(*sPtr = toupper(*sPtr)) sPtr++;
-    		}
-
-    		printf("server:: before upper: %s\n", commands[0]);
-	        uppercase(commands[0]);
-    		printf("server:: after upper: %s\n", commands[0]);
+            printf("server:: before upper: %s %s\n", commands[0], commands[1]);
+            uppercase(commands[0]);
+            printf("server:: after upper: %s %s\n", commands[0], commands[1]);
 
 			if(strcmp(commands[0], "QUIT") == 0){
 				sendMsg("221 Goodbye\n\r");
