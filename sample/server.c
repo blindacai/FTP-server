@@ -19,13 +19,15 @@
 
 //#define PORT "6500"  // the port users will be connecting to
 
-#define BACKLOG 10	 // how many pending connections queue will hold
+#define BACKLOG 1	 // how many pending connections queue will hold
 
 char buf[512];
 
 char root[100];
 
 int sockfd;
+
+char* port_num;
 
 void sigchld_handler(int s)
 {
@@ -55,6 +57,8 @@ int listenOnConnect(char* port){
 	struct sigaction sa;
 	int yes=1;
 	int rv;
+
+	port_num = port;
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
@@ -132,11 +136,11 @@ void acceptConnect(){
 		inet_ntop(their_addr.ss_family,
 			get_in_addr((struct sockaddr *)&their_addr),
 			s, sizeof s);
-		printf("server: got connection from %s\n\r", s);
+		printf("server: got connection from %s %s\r\n", s, port_num);
 
 		set_newfd(new_fd);
 		// once connection is set up, send 220; should not add \r here
-		sendMsg("220\n");
+		sendMsg("220 \r\n");
 
 		getcwd(root, 100);
 		set_rootdir(root);
@@ -166,7 +170,7 @@ void acceptConnect(){
 			int i = 0;
 			while(piece){
 				commands[i] = piece;
-				printf("piece is %s\n\r", piece);
+				printf("piece is %s\r\n", piece);
 				piece = strtok(NULL, " ");
 				i++;
 			}
@@ -178,14 +182,16 @@ void acceptConnect(){
             //printf("server:: after upper: %s %s\n", commands[0], commands[1]);
 
 			if(strcmp(commands[0], "QUIT") == 0){
-				sendMsg("221 Goodbye\n\r");
+				sendMsg("221 Goodbye\r\n");
 				resetLogin();
+				close(new_fd);
+				printf("new sock fd: %d\n", new_fd);
 				break;
 			}
 
 
 			if(arr_len(commands) > 2){
-				sendMsg("too many commands\n\r");
+				sendMsg("too many commands\r\n");
 			}
 			else{
 				response(commands);
@@ -197,8 +203,6 @@ void acceptConnect(){
 			// reset buf
 			memset(buf, 0, sizeof(buf));
 		}
-
-		close(new_fd);  // parent doesn't need this
 
 		continue;
 	}	

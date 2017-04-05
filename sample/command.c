@@ -28,7 +28,7 @@ int data_port;
 
 void set_rootdir(char* root){
 	strcpy(root_dir, root);
-	printf("root dir: %s\n\r", root_dir);
+	printf("root dir: %s\r\n", root_dir);
 }
 
 void set_newfd(int newfd){
@@ -46,7 +46,7 @@ void sendMsg(char* message){
 
 
 void invalid(){
-	sendMsg("500 Invalid Command.\n\r");
+	sendMsg("500 Invalid Command.\r\n");
 }
 
 
@@ -127,20 +127,20 @@ void remove_endofline(char** commands){
 // process 'user cs317' command
 void user(char* username){
 	if(loggedin){
-		sendMsg("You are already logged in\n\r");
+		sendMsg("You are already logged in\r\n");
 		return;
 	}
 	if(username == NULL){
-		sendMsg("530 Please provide username\n\r");
+		sendMsg("530 Please provide username\r\n");
 		return;
 	}
 
 	if(strcmp(username, "cs317") == 0){
-		sendMsg("230 Login successful.\n\r");
+		sendMsg("230 Login successful.\r\n");
 		loggedin = true;
 	}
 	else{
-		sendMsg("530 This FTP server is cs317 only.\n\r");
+		sendMsg("530 This FTP server is cs317 only.\r\n");
 	}
 }
 
@@ -148,15 +148,15 @@ void user(char* username){
 // process 'type image' command
 void type(char* thetype){
 	if(thetype == NULL){
-		sendMsg("Transfer type not specified\n\r");
+		sendMsg("Transfer type not specified\r\n");
 		return;
 	}
 
 	if(strcmp(thetype, "I") == 0){
-		sendMsg("200 Switching to Binary mode.\n\r");
+		sendMsg("200 Switching to Binary mode.\r\n");
 	}
 	else if(strcmp(thetype, "A") == 0){
-		sendMsg("200 Switching to ASCII mode.\n\r");
+		sendMsg("200 Switching to ASCII mode.\r\n");
 	}
 	else{
 		invalid();
@@ -171,7 +171,7 @@ bool notallow_match(char* dir){
 	reti = regcomp(&regex, "/{0,1}.{0,1}[.]/{0,1}", REG_EXTENDED);
 
 	if(reti){ 
-		fprintf(stderr, "Could not compile regex\n\r"); 
+		fprintf(stderr, "Could not compile regex\r\n"); 
     }
 
 	// execute
@@ -183,20 +183,20 @@ bool notallow_match(char* dir){
 // process 'cwd local' command
 void cdinto(char* dir){
 	if(dir == NULL){
-		sendMsg("Please provide the directory\n\r");
+		sendMsg("Please provide the directory\r\n");
 		return;
 	}
 
 	if(notallow_match(dir)){
-		sendMsg("550 Not allowed to change directory this way.\n\r");
+		sendMsg("550 Not allowed to change directory this way.\r\n");
 		listFiles(1, "./");            // for testing
 	}
 	else{
 		if(chdir(dir) == 0){
-			sendMsg("250 Directory successfully changed.\n\r");
+			sendMsg("250 Directory successfully changed.\r\n");
 		}
 		else{
-			sendMsg("550 Failed to change directory.\n\r");
+			sendMsg("550 Failed to change directory.\r\n");
 		}
 	
 		listFiles(1, "./");            // for testing
@@ -207,10 +207,10 @@ void cdinto(char* dir){
 // process 'MODE' command
 void switchmode(char* mode){
 	if(mode == NULL){
-		sendMsg("Transfer mode not specified\n\r");
+		sendMsg("Transfer mode not specified\r\n");
 	}
 	else{
-		sendMsg("We only support stream mode, sorry.\n\r");
+		sendMsg("We only support stream mode, sorry.\r\n");
 	}
 }
 
@@ -218,10 +218,10 @@ void switchmode(char* mode){
 // process 'STRU' command
 void switchstru(char* stru){
 	if(stru == NULL){
-		sendMsg("File structure not specified\n\r");
+		sendMsg("File structure not specified\r\n");
 	}
 	else{
-		sendMsg("We only support file structure, sorry.\n\r");
+		sendMsg("We only support file structure, sorry.\r\n");
 	}
 }
 
@@ -237,11 +237,11 @@ bool in_rootdir(){
 // process 'CDUP' command
 void cdto_parent(){
 	if(in_rootdir()){
-		sendMsg("Cannot change directory. Already in root\n\r");
+		sendMsg("Cannot change directory. Already in root\r\n");
 	}
 	else{
 		chdir("../");
-		sendMsg("250 Directory successfully changed.\n\r");
+		sendMsg("250 Directory successfully changed.\r\n");
 		listFiles(1, "./");              // for testing
 	}
 }
@@ -284,7 +284,7 @@ void dataConnection(int port){
 // create server response
 void response(char** commands){
 	if(!loggedin && (strcmp(commands[0], "USER") != 0)){
-		sendMsg("Please log in first\n\r");
+		sendMsg("Please log in first\r\n");
 		return;
 	}
 
@@ -308,15 +308,11 @@ void response(char** commands){
 	}
 	else if(strcmp(commands[0], "PASV") == 0){
 		listenOnConnect("27916");
-		sendMsg("227 Entering Passive Mode (127,0,0,1,109,12)\n\r");
-		acceptConnect();
-	}
-	else if (strcmp(commands[0], "PORT") == 0){
-		//parseIPandPort(commands[1]);
-		//sendMsg("ignore\n\r");
+		sendMsg("227 Entering Passive Mode (127,0,0,1,109,12)\r\n");
 	}
 	else if(strcmp(commands[0], "NLST") == 0){
-
+		// switch to data connection
+		acceptConnect();
 	}
 	else{
 		invalid();
