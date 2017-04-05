@@ -17,13 +17,15 @@
 #include <stdbool.h>
 #include "command.h"
 
-#define PORT "6500"  // the port users will be connecting to
+//#define PORT "6500"  // the port users will be connecting to
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
 char buf[512];
 
 char root[100];
+
+int sockfd;
 
 void sigchld_handler(int s)
 {
@@ -47,14 +49,11 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 
-int main(void){
-	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
+int listenOnConnect(char* port){
 	struct addrinfo hints, *servinfo, *p;
-	struct sockaddr_storage their_addr; // connector's address information
-	socklen_t sin_size;
+	
 	struct sigaction sa;
 	int yes=1;
-	char s[INET6_ADDRSTRLEN];
 	int rv;
 
 	memset(&hints, 0, sizeof hints);
@@ -62,7 +61,7 @@ int main(void){
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE; // use my IP
 
-	if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
+	if ((rv = getaddrinfo(NULL, port, &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
 	}
@@ -111,6 +110,16 @@ int main(void){
 	}
 
 	printf("server: waiting for connections...\n");
+
+	return 0;
+}
+
+void acceptConnect(){
+	socklen_t sin_size;
+	struct sockaddr_storage their_addr; // connector's address information
+	char s[INET6_ADDRSTRLEN];
+
+	int new_fd;  // listen on sock_fd, new connection on new_fd
 
 	while(1) {  // main accept() loop
 		sin_size = sizeof their_addr;
@@ -164,9 +173,9 @@ int main(void){
 
 			remove_endofline(commands);
 
-            printf("server:: before upper: %s %s\n", commands[0], commands[1]);
+            //printf("server:: before upper: %s %s\n", commands[0], commands[1]);
             uppercase(commands[0]);
-            printf("server:: after upper: %s %s\n", commands[0], commands[1]);
+            //printf("server:: after upper: %s %s\n", commands[0], commands[1]);
 
 			if(strcmp(commands[0], "QUIT") == 0){
 				sendMsg("221 Goodbye\n\r");
@@ -192,8 +201,5 @@ int main(void){
 		close(new_fd);  // parent doesn't need this
 
 		continue;
-	}
-
-
-	return 0;
+	}	
 }

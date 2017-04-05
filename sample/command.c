@@ -17,6 +17,7 @@
 
 #include "command.h"
 #include "dir.h"
+#include "server.h"
 
 int new_fd;
 bool loggedin = false;
@@ -273,6 +274,13 @@ void parseIPandPort(char* ipAndPort){
 }
 
 
+void dataConnection(int port){
+	char str[10];
+	sprintf(str, "%d", port);
+	listenOnConnect(str);
+}
+
+
 // create server response
 void response(char** commands){
 	if(!loggedin && (strcmp(commands[0], "USER") != 0)){
@@ -299,14 +307,16 @@ void response(char** commands){
 		cdto_parent();
 	}
 	else if(strcmp(commands[0], "PASV") == 0){
-		sendMsg("227 Enter PASV mode. \n\r");
+		listenOnConnect("27916");
+		sendMsg("227 Entering Passive Mode (127,0,0,1,109,12)\n\r");
+		acceptConnect();
 	}
 	else if (strcmp(commands[0], "PORT") == 0){
-		parseIPandPort(commands[1]);
-		//printf("data connection port is %d\n", data_port);
+		//parseIPandPort(commands[1]);
+		//sendMsg("ignore\n\r");
 	}
 	else if(strcmp(commands[0], "NLST") == 0){
-		sendMsg("some message. \n\r");
+
 	}
 	else{
 		invalid();
