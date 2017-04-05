@@ -47,8 +47,7 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 
-int main(void)
-{
+int main(void){
 	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
 	struct addrinfo hints, *servinfo, *p;
 	struct sockaddr_storage their_addr; // connector's address information
@@ -192,6 +191,7 @@ int main(void)
 
 		continue;
 	}
+
 
 	return 0;
 }
