@@ -10,6 +10,8 @@ void set_newfd(int newfd);
 void set_rootdir(char* root);
 
 void remove_endofline(char** commands);
+
+void uppercase (char* sPtr);
 void response(char** commands);
 
 void printfCommands(char** commands);
