@@ -251,28 +251,6 @@ void uppercase (char *sPtr) {
     while(*sPtr = toupper(*sPtr)) sPtr++;
 }
 
-void parseIPandPort(char* ipAndPort){
-	int count = 1;
-	int fifth;
-	int sixth;
-
-	char* pt = strtok(ipAndPort, ",");
-	while (pt != NULL) {
-		if(count == 5){
-			fifth = atoi(pt);
-			printf("fifth is %d\n", fifth);
-		}
-		if(count == 6){
-			sixth = atoi(pt);
-			printf("sixth is %d\n", sixth);
-		}
-		pt = strtok (NULL, ",");
-		count++;
-    }
-
-	data_port = fifth * 256 + sixth;
-}
-
 
 void dataConnection(int port){
 	char str[10];
@@ -311,8 +289,12 @@ void response(char** commands){
 		sendMsg("227 Entering Passive Mode (127,0,0,1,109,12)\r\n");
 	}
 	else if(strcmp(commands[0], "NLST") == 0){
+		sendMsg("150 Here comes the list\r\n");
 		// switch to data connection
-		acceptConnect();
+		acceptDataConnect();
+
+		// back to control
+		sendMsg("226 List transfer done\r\n");
 	}
 	else{
 		invalid();

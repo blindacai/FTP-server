@@ -3,4 +3,5 @@
 
 int listenOnConnect(char* port);
 void acceptConnect();
+void acceptDataConnect();
 #endif

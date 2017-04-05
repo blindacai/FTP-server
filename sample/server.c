@@ -29,6 +29,8 @@ int sockfd;
 
 char* port_num;
 
+bool data_connection = 0;
+
 void sigchld_handler(int s)
 {
 	// waitpid() might overwrite errno, so we save and restore it:
@@ -149,17 +151,6 @@ void acceptConnect(){
 
 		// need a receive function somewhere in the loop
 
-/*
-		if (!fork()) { // this is the child process
-			close(sockfd); // child doesn't need the listener
-			if (send(new_fd, "Hello, world!\n", 13+1, 0) == -1)            // argv: file descripter, message, size of the message, flag(should always be zero)
-				perror("send");
-			close(new_fd);
-			exit(0);
-		}
-*/
-
-		// note that size of buf is 512
 		int result;
 		while((result = recv(new_fd, buf, sizeof(buf), 0)) != -1){
 
@@ -206,4 +197,32 @@ void acceptConnect(){
 
 		continue;
 	}	
+}
+
+void acceptDataConnect(){
+	socklen_t sin_size;
+	struct sockaddr_storage their_addr; // connector's address information
+	char s[INET6_ADDRSTRLEN];
+
+	int new_fd;  // listen on sock_fd, new connection on new_fd
+
+	sin_size = sizeof their_addr;
+	new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);        // argv: original file descripter, pointer to the address of the client, size of the struct
+	if (new_fd == -1) {
+		perror("accept");  // should be 'not accept'?
+		//continue;     // back to the beginning of outer while, waiting for connection
+	}
+
+	inet_ntop(their_addr.ss_family,
+		get_in_addr((struct sockaddr *)&their_addr),
+		s, sizeof s);
+	printf("server: got connection from %s %s\r\n", s, port_num);
+
+	// once connection is set up, send 220; should not add \r here
+	char* message = "101010\r\n";
+	send(new_fd, message, strlen(message), 0);
+}
+
+void turnOnData(){
+	data_connection = 1;
 }
