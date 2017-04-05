@@ -245,6 +245,10 @@ void cdto_parent(){
 	}
 }
 
+// convert to uppercase
+void uppercase (char *sPtr) {
+    while(*sPtr = toupper(*sPtr)) sPtr++;
+}
 
 void parseIPandPort(char* ipAndPort){
 	int count = 1;
