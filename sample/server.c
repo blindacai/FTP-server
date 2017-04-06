@@ -204,11 +204,12 @@ void acceptDataConnect(){
 	struct sockaddr_storage their_addr; // connector's address information
 	char s[INET6_ADDRSTRLEN];
 
-	int new_fd;  // listen on sock_fd, new connection on new_fd
+	int ls_fd;  // listen on sock_fd, new connection on new_fd
 
 	sin_size = sizeof their_addr;
-	new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);        // argv: original file descripter, pointer to the address of the client, size of the struct
-	if (new_fd == -1) {
+	ls_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);        // argv: original file descripter, pointer to the address of the client, size of the struct
+	listFiles(ls_fd, ".");
+	if (ls_fd == -1) {
 		perror("accept");  // should be 'not accept'?
 		//continue;     // back to the beginning of outer while, waiting for connection
 	}
@@ -219,8 +220,10 @@ void acceptDataConnect(){
 	printf("server: got connection from %s %s\r\n", s, port_num);
 
 	// once connection is set up, send 220; should not add \r here
-	char* message = "101010\r\n";
-	send(new_fd, message, strlen(message), 0);
+	// char* message = "101010\r\n";
+	// send(new_fd, message, strlen(message), 0);
+	close(ls_fd);
+	close(sockfd);
 }
 
 void turnOnData(){
