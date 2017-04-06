@@ -180,6 +180,5 @@ int connectControl(char* port){
 		continue;
 	}
 
-
 	return 0;
 }
