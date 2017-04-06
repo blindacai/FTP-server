@@ -12,6 +12,8 @@
 #include <signal.h>
 #include <stdbool.h>
 
+#include <ifaddrs.h>
+
 #include <regex.h>
 #include <ctype.h>
 #include "command.h"
@@ -20,6 +22,7 @@
 #include "dataServer.h"
 
 #include <sys/sendfile.h>
+#include <time.h>
 
 int new_fd;
 bool loggedin = false;
@@ -296,9 +299,55 @@ void response(char** commands){
 		cdto_parent();
 	}
 	else if(strcmp(commands[0], "PASV") == 0){
-		listenOnDataConnect("27913");
-		sendMsg("227 Entering Passive Mode (127,0,0,1,109,9)\r\n");
-	}
+        // get current IP address: code section taken from 
+        // http://stackoverflow.com/questions/4139405/how-can-i-get-to-know-the-ip-address-for-interfaces-in-c
+        struct ifaddrs *ifap, *ifa;
+        struct sockaddr_in *sa;
+        char *addr;
+
+        getifaddrs (&ifap);
+        for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+            if (ifa->ifa_addr->sa_family==AF_INET) {
+                sa = (struct sockaddr_in *) ifa->ifa_addr;
+                addr = inet_ntoa(sa->sin_addr);
+                if(strcmp(addr, "127.0.0.1") != 0){
+                    printf("Interface: %s\tAddress: %s\n", ifa->ifa_name, addr);
+                    break;
+                }
+            }
+         }
+        freeifaddrs(ifap);
+        // end of code taken section
+        printf("%s\r\n",addr);
+
+        srand(time(NULL));
+
+        char serverIPPort[512];
+        int portA = 100 + (rand() % 64);
+        int portB = rand() % 256;
+        int port = (portA * 256) + portB;
+
+        printf("%d x 256 + %d = %d\r\n", portA, portB, port);
+
+        char portAsChar[512];
+        sprintf(portAsChar, "%d", port);
+        printf("%s\r\n", portAsChar);
+
+        char* IPPiece = strtok(addr, ".");
+
+        char* IPChunk[4] = {NULL, NULL, NULL, NULL};  // should it be dynamic?
+        int i;
+        for(i = 0; i < 4; i++){
+            IPChunk[i] = IPPiece;
+            IPPiece = strtok(NULL, ".");
+        }
+
+        char myString[1024];
+        sprintf(myString, "227 Entering Passive Mode (%s,%s,%s,%s,%d,%d)\r\n", IPChunk[0], IPChunk[1], IPChunk[2], IPChunk[3], portA, portB);
+
+        listenOnDataConnect(portAsChar);
+        sendMsg(myString);
+    }
 	else if(strcmp(commands[0], "NLST") == 0){
 		sendMsg("150 Here comes the list\r\n");
 		// switch to data connection
