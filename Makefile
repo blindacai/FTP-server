@@ -17,13 +17,19 @@ CPPFLAGS=
 CFLAGS=-g -Werror-implicit-function-declaration
 
 #List all the .o files here that need to be linked 
-OBJS=CSftp.o usage.o dir.o 
+OBJS=CSftp.o usage.o dir.o controlServer.o dataServer.o command.o
 
 usage.o: usage.c usage.h
 
 dir.o: dir.c dir.h
 
-CSftp.o: CSftp.c dir.h usage.h
+CSftp.o: CSftp.c dir.h usage.h controlServer.h
+
+controlServer.o: controlServer.c command.h
+
+dataServer.o: dataServer.c dir.h
+
+command.o: command.c dir.h dataServer.h
 
 CSftp: $(OBJS) 
 	$(CC) -o CSftp $(OBJS) 

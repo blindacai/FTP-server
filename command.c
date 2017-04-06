@@ -13,7 +13,7 @@
 #include <stdbool.h>
 
 #include <regex.h>
-#include <sys/types.h>
+#include <ctype.h>
 #include "command.h"
 
 #include "dir.h"

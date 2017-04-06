@@ -15,8 +15,8 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <stdbool.h>
-#include "command.h"
 #include "controlServer.h"
+#include "command.h"
 
 #define BACKLOG 1	 // how many pending connections queue will hold
 
@@ -152,7 +152,7 @@ int connectControl(char* port){
 
 			remove_endofline(commands);
 
-			uppercase (commands[0]);
+			uppercase(commands[0]);
 
 			if(strcmp(commands[0], "QUIT") == 0){
 				sendMsg("221 Goodbye \r\n");
