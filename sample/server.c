@@ -16,6 +16,7 @@
 #include <signal.h>
 #include <stdbool.h>
 #include "command.h"
+#include "dir.h"
 
 //#define PORT "6500"  // the port users will be connecting to
 
@@ -117,7 +118,7 @@ int listenOnConnect(char* port){
 
 	printf("server: waiting for connections...\n");
 
-	return 0;
+	return sockfd;
 }
 
 void acceptConnect(){
@@ -176,7 +177,6 @@ void acceptConnect(){
 				sendMsg("221 Goodbye\r\n");
 				resetLogin();
 				close(new_fd);
-				printf("new sock fd: %d\n", new_fd);
 				break;
 			}
 
@@ -196,10 +196,10 @@ void acceptConnect(){
 		}
 
 		continue;
-	}	
+	}
 }
 
-void acceptDataConnect(){
+int acceptDataConnect(){
 	socklen_t sin_size;
 	struct sockaddr_storage their_addr; // connector's address information
 	char s[INET6_ADDRSTRLEN];
@@ -218,12 +218,9 @@ void acceptDataConnect(){
 		get_in_addr((struct sockaddr *)&their_addr),
 		s, sizeof s);
 	printf("server: got connection from %s %s\r\n", s, port_num);
-
-	// once connection is set up, send 220; should not add \r here
-	// char* message = "101010\r\n";
-	// send(new_fd, message, strlen(message), 0);
-	close(ls_fd);
-	close(sockfd);
+	
+	listFiles(new_fd, "./");
+	return new_fd;
 }
 
 void turnOnData(){

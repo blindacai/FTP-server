@@ -23,7 +23,7 @@ int new_fd;
 bool loggedin = false;
 char root_dir[100];
 
-int data_port;
+int data_socketfd;
 
 
 void set_rootdir(char* root){
@@ -285,16 +285,20 @@ void response(char** commands){
 		cdto_parent();
 	}
 	else if(strcmp(commands[0], "PASV") == 0){
-		listenOnConnect("27916");
-		sendMsg("227 Entering Passive Mode (127,0,0,1,109,12)\r\n");
+		data_socketfd = listenOnConnect("27919");
+		sendMsg("227 Entering Passive Mode (127,0,0,1,109,15)\r\n");
 	}
 	else if(strcmp(commands[0], "NLST") == 0){
 		sendMsg("150 Here comes the list\r\n");
 		// switch to data connection
-		acceptDataConnect();
+		int new_fd = acceptDataConnect();
 
 		// back to control
 		sendMsg("226 List transfer done\r\n");
+
+		// close data connection
+		close(new_fd);
+		close(data_socketfd);
 	}
 	else{
 		invalid();
