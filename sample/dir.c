@@ -56,6 +56,7 @@ int listFiles(int fd, char * directory) {
     } else {
       dprintf(fd, "U        %s\n", dirEntry->d_name);
     }
+
     entriesPrinted++;
   }
   
