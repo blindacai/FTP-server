@@ -4,4 +4,6 @@
 int listenOnDataConnect(char* port);
 int acceptDataConnect();
 int getDataSocket();
+
+void setListfile();
 #endif

@@ -19,6 +19,8 @@
 #include "dir.h"
 #include "dataServer.h"
 
+#include <sys/sendfile.h>
+
 int new_fd;
 bool loggedin = false;
 char root_dir[100];
@@ -250,6 +252,24 @@ void uppercase (char *sPtr) {
 }
 
 
+void retrieve(char* filename){
+	sendMsg("150 Opening BINARY mode data connection \r\n");
+	setListfile();
+	// switch to data connection
+	int data_fd = acceptDataConnect();
+
+	FILE *file = fopen(filename, "r");
+
+	// back to control
+	sendMsg("226 File send OK.\r\n");
+
+	// close data connection
+	close(data_fd);
+	close(getDataSocket());
+	
+}
+
+
 // create server response
 void response(char** commands){
 	if(!loggedin && (strcmp(commands[0], "USER") != 0)){
@@ -275,7 +295,6 @@ void response(char** commands){
 	else if(strcmp(commands[0], "CDUP") == 0){
 		cdto_parent();
 	}
-	
 	else if(strcmp(commands[0], "PASV") == 0){
 		listenOnDataConnect("27913");
 		sendMsg("227 Entering Passive Mode (127,0,0,1,109,9)\r\n");
@@ -293,7 +312,7 @@ void response(char** commands){
 		close(getDataSocket());
 	}
 	else if(strcmp(commands[0], "RETR") == 0){
-
+		retrieve(commands[1]);
 	}
 	
 	else{

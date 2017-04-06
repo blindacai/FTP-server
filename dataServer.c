@@ -28,6 +28,8 @@ int sockfd;
 
 char* port_num;
 
+bool listfile = 1;
+
 void sigchld_handler_data(int s)
 {
 	// waitpid() might overwrite errno, so we save and restore it:
@@ -136,10 +138,17 @@ int acceptDataConnect(){
 		s, sizeof s);
 	printf("server: got connection from %s %s\r\n", s, port_num);
 	
-	listFiles(new_fd, "./");
+	if(listfile){
+		listFiles(new_fd, "./");
+	}
+
 	return new_fd;
 }
 
 int getDataSocket(){
     return sockfd;
+}
+
+void setListfile(){
+	listfile = 0;
 }
