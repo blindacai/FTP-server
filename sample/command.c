@@ -14,16 +14,14 @@
 
 #include <regex.h>
 #include <sys/types.h>
-
 #include "command.h"
+
 #include "dir.h"
-#include "server.h"
+#include "dataServer.h"
 
 int new_fd;
 bool loggedin = false;
 char root_dir[100];
-
-int data_socketfd;
 
 
 void set_rootdir(char* root){
@@ -237,7 +235,7 @@ bool in_rootdir(){
 // process 'CDUP' command
 void cdto_parent(){
 	if(in_rootdir()){
-		sendMsg("Cannot change directory. Already in root\r\n");
+		sendMsg("550 Cannot change directory. Already in root\r\n");
 	}
 	else{
 		chdir("../");
@@ -249,13 +247,6 @@ void cdto_parent(){
 // convert to uppercase
 void uppercase (char *sPtr) {
     while(*sPtr = toupper(*sPtr)) sPtr++;
-}
-
-
-void dataConnection(int port){
-	char str[10];
-	sprintf(str, "%d", port);
-	listenOnConnect(str);
 }
 
 
@@ -284,22 +275,27 @@ void response(char** commands){
 	else if(strcmp(commands[0], "CDUP") == 0){
 		cdto_parent();
 	}
+	
 	else if(strcmp(commands[0], "PASV") == 0){
-		data_socketfd = listenOnConnect("27919");
-		sendMsg("227 Entering Passive Mode (127,0,0,1,109,15)\r\n");
+		listenOnDataConnect("27913");
+		sendMsg("227 Entering Passive Mode (127,0,0,1,109,9)\r\n");
 	}
 	else if(strcmp(commands[0], "NLST") == 0){
 		sendMsg("150 Here comes the list\r\n");
 		// switch to data connection
-		int new_fd = acceptDataConnect();
+		int data_fd = acceptDataConnect();
 
 		// back to control
 		sendMsg("226 List transfer done\r\n");
 
 		// close data connection
-		close(new_fd);
-		close(data_socketfd);
+		close(data_fd);
+		close(getDataSocket());
 	}
+	else if(strcmp(commands[0], "RETR") == 0){
+
+	}
+	
 	else{
 		invalid();
 	}

@@ -16,21 +16,13 @@
 #include <signal.h>
 #include <stdbool.h>
 #include "command.h"
-#include "dir.h"
-
-//#define PORT "6500"  // the port users will be connecting to
+#include "controlServer.h"
 
 #define BACKLOG 1	 // how many pending connections queue will hold
 
 char buf[512];
 
 char root[100];
-
-int sockfd;
-
-char* port_num;
-
-bool data_connection = 0;
 
 void sigchld_handler(int s)
 {
@@ -54,14 +46,15 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 
-int listenOnConnect(char* port){
+int connectControl(char* port){
+	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
 	struct addrinfo hints, *servinfo, *p;
-	
+	struct sockaddr_storage their_addr; // connector's address information
+	socklen_t sin_size;
 	struct sigaction sa;
 	int yes=1;
+	char s[INET6_ADDRSTRLEN];
 	int rv;
-
-	port_num = port;
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
@@ -118,16 +111,6 @@ int listenOnConnect(char* port){
 
 	printf("server: waiting for connections...\n");
 
-	return sockfd;
-}
-
-void acceptConnect(){
-	socklen_t sin_size;
-	struct sockaddr_storage their_addr; // connector's address information
-	char s[INET6_ADDRSTRLEN];
-
-	int new_fd;  // listen on sock_fd, new connection on new_fd
-
 	while(1) {  // main accept() loop
 		sin_size = sizeof their_addr;
 		new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);        // argv: original file descripter, pointer to the address of the client, size of the struct
@@ -139,7 +122,7 @@ void acceptConnect(){
 		inet_ntop(their_addr.ss_family,
 			get_in_addr((struct sockaddr *)&their_addr),
 			s, sizeof s);
-		printf("server: got connection from %s %s\r\n", s, port_num);
+		printf("server: got connection from %s\n", s);
 
 		set_newfd(new_fd);
 		// once connection is set up, send 220; should not add \r here
@@ -162,21 +145,18 @@ void acceptConnect(){
 			int i = 0;
 			while(piece){
 				commands[i] = piece;
-				printf("piece is %s\r\n", piece);
+				printf("piece is %s\n", piece);
 				piece = strtok(NULL, " ");
 				i++;
 			}
 
 			remove_endofline(commands);
 
-            //printf("server:: before upper: %s %s\n", commands[0], commands[1]);
-            uppercase(commands[0]);
-            //printf("server:: after upper: %s %s\n", commands[0], commands[1]);
+			uppercase (commands[0]);
 
 			if(strcmp(commands[0], "QUIT") == 0){
-				sendMsg("221 Goodbye\r\n");
+				sendMsg("221 Goodbye \r\n");
 				resetLogin();
-				close(new_fd);
 				break;
 			}
 
@@ -195,34 +175,11 @@ void acceptConnect(){
 			memset(buf, 0, sizeof(buf));
 		}
 
+		close(new_fd);  // parent doesn't need this
+
 		continue;
 	}
-}
 
-int acceptDataConnect(){
-	socklen_t sin_size;
-	struct sockaddr_storage their_addr; // connector's address information
-	char s[INET6_ADDRSTRLEN];
 
-	int ls_fd;  // listen on sock_fd, new connection on new_fd
-
-	sin_size = sizeof their_addr;
-	ls_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);        // argv: original file descripter, pointer to the address of the client, size of the struct
-	listFiles(ls_fd, ".");
-	if (ls_fd == -1) {
-		perror("accept");  // should be 'not accept'?
-		//continue;     // back to the beginning of outer while, waiting for connection
-	}
-
-	inet_ntop(their_addr.ss_family,
-		get_in_addr((struct sockaddr *)&their_addr),
-		s, sizeof s);
-	printf("server: got connection from %s %s\r\n", s, port_num);
-	
-	listFiles(new_fd, "./");
-	return new_fd;
-}
-
-void turnOnData(){
-	data_connection = 1;
+	return 0;
 }

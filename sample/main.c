@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "server.h"
+#include "controlServer.h"
 
 int main(int argc, char **argv){
-    listenOnConnect(argv[1]);
-    acceptConnect();
+    connectControl(argv[1]);
 }
