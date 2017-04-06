@@ -16,6 +16,7 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <sys/sendfile.h>
+#include <sys/stat.h>
 
 #include "dataServer.h"
 #include "dir.h"
@@ -32,6 +33,8 @@ char* port_num;
 bool listfile = 1;
 
 char* filename;
+
+int filesize;
 
 void sigchld_handler_data(int s)
 {
@@ -146,7 +149,7 @@ int acceptDataConnect(){
 	}
 	else{
 		FILE *file = fopen(filename, "r");
-		sendfile(new_fd, fileno(file), NULL, 200);
+		sendfile(new_fd, fileno(file), NULL, filesize);
 	}
 
 	return new_fd;
@@ -160,6 +163,17 @@ void setListfile(){
 	listfile = 0;
 }
 
+off_t fsize(const char *filename) {
+    struct stat st; 
+
+    if (stat(filename, &st) == 0)
+        return st.st_size;
+
+    return -1; 
+}
+
 void setFilename(char* name){
 	filename = name;
+	filesize = fsize(name);
+	printf("file size is %d\n", filesize);
 }
