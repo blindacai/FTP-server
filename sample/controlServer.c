@@ -135,17 +135,6 @@ int connectControl(char* port){
 
 		// need a receive function somewhere in the loop
 
-/*
-		if (!fork()) { // this is the child process
-			close(sockfd); // child doesn't need the listener
-			if (send(new_fd, "Hello, world!\n", 13+1, 0) == -1)            // argv: file descripter, message, size of the message, flag(should always be zero)
-				perror("send");
-			close(new_fd);
-			exit(0);
-		}
-*/
-
-		// note that size of buf is 512
 		int result;
 		while((result = recv(new_fd, buf, sizeof(buf), 0)) != -1){
 
@@ -156,24 +145,24 @@ int connectControl(char* port){
 			int i = 0;
 			while(piece){
 				commands[i] = piece;
-				printf("piece is %s\n\r", piece);
+				printf("piece is %s\n", piece);
 				piece = strtok(NULL, " ");
 				i++;
 			}
 
 			remove_endofline(commands);
 
-			// TODO: conver to uppercase
+			uppercase (commands[0]);
 
 			if(strcmp(commands[0], "QUIT") == 0){
-				sendMsg("221 Goodbye\n\r");
+				sendMsg("221 Goodbye \r\n");
 				resetLogin();
 				break;
 			}
 
 
 			if(arr_len(commands) > 2){
-				sendMsg("too many commands\n\r");
+				sendMsg("too many commands\r\n");
 			}
 			else{
 				response(commands);
