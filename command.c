@@ -258,10 +258,10 @@ void uppercase (char *sPtr) {
 void retrieve(char* filename){
 	sendMsg("150 Opening BINARY mode data connection \r\n");
 	setListfile();
+	setFilename(filename);
+
 	// switch to data connection
 	int data_fd = acceptDataConnect();
-
-	FILE *file = fopen(filename, "r");
 
 	// back to control
 	sendMsg("226 File send OK.\r\n");
@@ -269,9 +269,7 @@ void retrieve(char* filename){
 	// close data connection
 	close(data_fd);
 	close(getDataSocket());
-	
 }
-
 
 // create server response
 void response(char** commands){

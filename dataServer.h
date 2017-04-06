@@ -6,4 +6,5 @@ int acceptDataConnect();
 int getDataSocket();
 
 void setListfile();
+void setFilename(char* name);
 #endif

@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <sys/sendfile.h>
 
 #include "dataServer.h"
 #include "dir.h"
@@ -29,6 +30,8 @@ int sockfd;
 char* port_num;
 
 bool listfile = 1;
+
+char* filename;
 
 void sigchld_handler_data(int s)
 {
@@ -141,6 +144,10 @@ int acceptDataConnect(){
 	if(listfile){
 		listFiles(new_fd, "./");
 	}
+	else{
+		FILE *file = fopen(filename, "r");
+		sendfile(new_fd, fileno(file), NULL, 200);
+	}
 
 	return new_fd;
 }
@@ -151,4 +158,8 @@ int getDataSocket(){
 
 void setListfile(){
 	listfile = 0;
+}
+
+void setFilename(char* name){
+	filename = name;
 }
